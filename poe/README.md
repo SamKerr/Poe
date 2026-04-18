@@ -31,6 +31,13 @@ From `poe/`:
 
 - `./mvnw clean install`
 
+## API docs (Swagger)
+
+Once the app is running locally:
+
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+
 ### Quick start script
 
 From repository root:

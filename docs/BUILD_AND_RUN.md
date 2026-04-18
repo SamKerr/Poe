@@ -106,7 +106,18 @@ Environment variables:
 
 Rate-limited requests return HTTP `429` with a structured error payload including `retryAt`.
 
-## 6) SQLite storage
+## 6) OpenAPI and Swagger UI
+
+When the app is running locally:
+
+```bash
+open http://localhost:8080/swagger-ui/index.html
+curl http://localhost:8080/v3/api-docs
+```
+
+Use Swagger UI to execute `POST /poems`, `GET /poems/{id}`, and feed endpoints directly from the browser.
+
+## 7) SQLite storage
 
 - SQLite path defaults to `/app/data/poe.db` inside the app container.
 - Docker Compose maps `./db/sqlite-data` from your repo to `/app/data` for persistence.
