@@ -26,4 +26,4 @@ Ship an anonymous poetry backend MVP with mindful feed behavior and lightweight 
 ## Result
 
 - Build/test verification passed (`./mvnw clean install`)
-- Epic folders moved to `epics/done/`
+- Ticket files moved to `sprints/tickets/done/`

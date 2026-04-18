@@ -52,4 +52,4 @@ Deliver a basic functioning server-rendered UI for the poetry service.
 - [ ] All pages render and navigate correctly
 - [ ] Write flow redirects to home on success
 - [ ] Build/tests pass (`cd poe && ./mvnw clean install`)
-- [ ] Sprint file moved to `epics/sprints/done/` when complete
+- [ ] Sprint file moved to `sprints/plans/done/` when complete

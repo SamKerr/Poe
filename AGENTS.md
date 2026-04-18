@@ -24,20 +24,20 @@
 - Do not change unrelated behavior
 - Do not revert any work done by the user, but inspect it and make sure bugs are not introduced
 
-## Epic and sprint workflow
+## Sprint workflow
 
 Use this process for multi-step feature work so planning and delivery are consistent.
 
 ### Required lifecycle
 
 1. Clarify scope and lock product constraints with the user.
-2. Create/maintain epic folders under `epics/` (active work), each with:
-   - `README.md` describing goal/scope/done criteria
-   - `tickets/` containing one file per ticket
-3. Create/update the active sprint plan in `epics/sprints/`:
+2. Create/update the active sprint plan in `sprints/plans/`:
    - file name format: `sprint-<n>.md` (example: `sprint-2.md`)
-   - include scope, agent assignment, sequencing, and done criteria
-   - use `epics/sprints/sprint-template.md` as the baseline
+   - include scope, ticket list, agent assignment, sequencing, and done criteria
+   - use `sprints/plans/sprint-template.md` as the baseline
+3. Create or update sprint ticket files in `sprints/tickets/`:
+   - one file per active ticket (`Txx-...md`)
+   - move completed ticket files into `sprints/tickets/done/`
 4. Split sprint scope across subagents with clear ownership boundaries to avoid overlap.
 5. Implement sprint scope in sensible commit points (small, coherent chunks).
 6. Verify each commit chunk before moving to the next one:
@@ -45,17 +45,15 @@ Use this process for multi-step feature work so planning and delivery are consis
    - confirm expected behavior for changed endpoints/flows
    - fix regressions immediately before continuing
 7. After all chunks pass verification, complete the sprint scope.
-8. When a sprint is complete, move its sprint file:
-   - `epics/sprints/sprint-<n>.md` -> `epics/sprints/done/sprint-<n>.md`
-9. When an epic is fully complete and verified, move its folder:
-   - `epics/<epic-name>/` -> `epics/done/<epic-name>/`
-10. Keep active-only items in:
-   - `epics/` for active epics
-   - `epics/sprints/` for active sprint plans
-11. Keep completed-only items in:
-   - `epics/done/` for completed epics
-   - `epics/sprints/done/` for completed sprint plans
-12. Update docs whenever commands, behavior, or process changes.
+8. When a sprint is complete, move its sprint plan file:
+   - `sprints/plans/sprint-<n>.md` -> `sprints/plans/done/sprint-<n>.md`
+9. Keep active-only items in:
+   - `sprints/plans/` for active sprint plans
+   - `sprints/tickets/` for active ticket files
+10. Keep completed-only items in:
+   - `sprints/plans/done/` for completed sprint plans
+   - `sprints/tickets/done/` for completed ticket files
+11. Update docs whenever commands, behavior, or process changes.
 
 ## How to verify changes
 

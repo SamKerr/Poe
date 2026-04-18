@@ -38,4 +38,4 @@
 - [ ] Code merged
 - [ ] Tests/build pass (`cd poe && ./mvnw clean install`)
 - [ ] Docs updated as needed
-- [ ] Sprint moved to `epics/sprints/done/`
+- [ ] Sprint moved to `sprints/plans/done/`
