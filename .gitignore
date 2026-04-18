@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# IntelliJ
+.idea/
+*.iml
+
+# Java / Maven
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+
+# SQLite runtime data
+db/sqlite-data/*.db
+db/sqlite-data/*.db-*
+

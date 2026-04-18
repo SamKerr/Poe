@@ -1,0 +1,14 @@
+services:
+  poe-api:
+    build:
+      context: ./poe
+      dockerfile: Dockerfile
+    container_name: poe-api
+    restart: unless-stopped
+    environment:
+      SQLITE_DATASOURCE_URL: ${SQLITE_DATASOURCE_URL:-jdbc:sqlite:/app/data/poe.db}
+      SERVER_PORT: 8080
+    volumes:
+      - ./db/sqlite-data:/app/data
+    ports:
+      - "${SPRING_APP_PORT:-8080}:8080"
