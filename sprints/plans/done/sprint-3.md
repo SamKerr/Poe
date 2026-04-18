@@ -47,10 +47,10 @@ Deploy the Poe site behind CloudFront using a single app instance with persisten
 
 ## Done criteria
 
-- [ ] CloudFront serves the app over HTTPS
-- [ ] App runs in single-instance mode on cloud host
-- [ ] SQLite persists across restart/redeploy
-- [ ] Backup and restore are tested successfully
-- [ ] Smoke tests pass through CloudFront endpoint
-- [ ] Deployment and rollback docs are complete
-- [ ] Sprint moved to `sprints/plans/done/`
+- [x] CloudFront serves the app over HTTPS
+- [x] App runs in single-instance mode on cloud host
+- [x] SQLite persists across restart/redeploy
+- [x] Backup and restore are tested successfully
+- [x] Smoke tests pass through CloudFront endpoint
+- [x] Deployment and rollback docs are complete
+- [x] Sprint moved to `sprints/plans/done/`
