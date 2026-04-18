@@ -120,6 +120,7 @@ Use Swagger UI to execute `POST /poems`, `GET /poems/{id}`, and feed endpoints d
 - SQLite path defaults to `/app/data/poe.db` inside the app container.
 - Docker Compose maps `./db/sqlite-data` from your repo to `/app/data` for persistence.
 - Override path via `SQLITE_DATASOURCE_URL` in `.env` if needed.
+- Backup and restore operations guide: `docs/SQLITE_PERSISTENCE_AND_BACKUP.md`.
 - SQLite schema/data scripts live in:
   - `poe/src/main/resources/db/sqlite/schema.sql`
   - `poe/src/main/resources/db/sqlite/data.sql`
