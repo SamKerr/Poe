@@ -8,11 +8,14 @@
 </head>
 <body>
   <header class="container">
-    <h1>Poe</h1>
+    <div class="brand">
+      <img class="brand-image" src="/poe.webp" alt="Edgar Allan Poe portrait">
+      <h1>Poe</h1>
+    </div>
     <nav>
       <a href="/">Today</a>
       <a href="/history">History</a>
-      <a href="/write">Write</a>
+      <a href="/write">Write A Poem</a>
     </nav>
   </header>
 
@@ -24,9 +27,28 @@
       <form method="post" action="/write">
         <label for="content">Poem</label>
         <textarea id="content" name="content" maxlength="2000" required th:text="${content}"></textarea>
+        <p id="char-counter" class="muted char-counter" aria-live="polite">0 / 2000 characters</p>
         <button type="submit">Post poem</button>
       </form>
     </section>
   </main>
+  <script>
+    (function () {
+      var textarea = document.getElementById("content");
+      var counter = document.getElementById("char-counter");
+      var maxChars = 2000;
+
+      if (!textarea || !counter) {
+        return;
+      }
+
+      function updateCounter() {
+        counter.textContent = textarea.value.length + " / " + maxChars + " characters";
+      }
+
+      textarea.addEventListener("input", updateCounter);
+      updateCounter();
+    })();
+  </script>
 </body>
 </html>

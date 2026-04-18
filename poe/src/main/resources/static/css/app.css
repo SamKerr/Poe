@@ -21,6 +21,19 @@ header {
   margin-bottom: 1rem;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 nav {
   display: flex;
   gap: 1rem;
@@ -76,6 +89,10 @@ textarea {
   border: 1px solid #bbb;
   border-radius: 6px;
   font: inherit;
+}
+
+.char-counter {
+  margin: 0.5rem 0 0;
 }
 
 button {
