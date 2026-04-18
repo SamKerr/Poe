@@ -1,14 +1,14 @@
-# Poe API - backend service for a poetry social app
+# Poe API
 
-`poe/` contains the Spring Boot backend service for Poe: a poetry-first social app.
+`poe/` contains the Spring Boot backend service for Poe.
 
-Think "Twitter clone, but only for poetry":
+Current product model is intentionally simple:
 
-- users create accounts and manage profiles
-- users post short poems instead of general status updates
-- the API handles data storage and backend logic for the app
-
-This project currently focuses on the backend service and local developer workflow.
+- Anonymous publishing (no auth/account model)
+- Plain-text poems only
+- `content` hard limit of 2000 characters
+- Shared daily feed capped at 10 poems for a given UTC day
+- History is browsed by requesting a specific day (no infinite timeline)
 
 ## Tech stack
 
@@ -44,9 +44,51 @@ The script will try to start Docker Desktop on macOS, wait for Docker to be read
 
 1. Check app and database connectivity:
    - `curl http://localhost:8080/`
-   - `curl http://localhost:8080/users`
    - `curl http://localhost:8080/sqlite`
+   - `curl http://localhost:8080/users`
    - `curl http://localhost:8080/sqlite/users`
+
+2. Publish and read poems:
+   - Create a poem:
+     - `curl -X POST http://localhost:8080/poems -H "Content-Type: application/json" -d '{"content":"first line\nsecond line"}'`
+   - Fetch by id:
+     - `curl http://localhost:8080/poems/1`
+   - Daily feed (today UTC):
+     - `curl http://localhost:8080/feed/daily`
+   - Feed for a specific UTC day:
+     - `curl http://localhost:8080/feed/daily/2026-03-15`
+
+## API behavior and constraints
+
+### `POST /poems`
+
+- Accepts JSON body with `content` string
+- Normalizes line breaks to `\n` and trims outer whitespace
+- Rejects null/blank content
+- Rejects content over 2000 characters
+- Returns `201 Created` with poem payload
+
+### Guardrails on `POST /poems`
+
+- IP rate limit guard (from `X-Forwarded-For` first value, fallback to remote addr):
+  - Default `5` requests / `10` minutes per IP
+- Duplicate-content guard:
+  - Rejects same normalized content hash submitted in configured recent window
+  - Default window `24` hours
+
+Config is controlled through properties/env vars:
+
+- `poems.guardrails.rate-limit.max-requests` (`POEMS_GUARDRAILS_RATE_LIMIT_MAX_REQUESTS`, default `5`)
+- `poems.guardrails.rate-limit.window` (`POEMS_GUARDRAILS_RATE_LIMIT_WINDOW`, default `PT10M`)
+- `poems.guardrails.duplicate-window` (`POEMS_GUARDRAILS_DUPLICATE_WINDOW`, default `PT24H`)
+
+### Structured error responses
+
+Errors are returned as:
+
+- `{"error":{"code":"...","message":"...","retryAt":"..."}}`
+
+`retryAt` is populated for rate-limit responses (`429`) and null for other error classes.
 
 ## Database connection values in container
 

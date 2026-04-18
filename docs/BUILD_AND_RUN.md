@@ -43,18 +43,70 @@ Force a fresh image rebuild:
 
 ```bash
 curl http://localhost:8080/
-curl http://localhost:8080/users
 curl http://localhost:8080/sqlite
+curl http://localhost:8080/users
 curl http://localhost:8080/sqlite/users
 ```
 
 Expected:
 - `/` returns an `ok` status with DB check
-- `/users` returns seeded records
 - `/sqlite` returns an `ok` status with SQLite check
+- `/users` returns seeded records
 - `/sqlite/users` returns seeded SQLite records
 
-## 4) SQLite storage
+## 4) Verify poem endpoints
+
+Create a poem:
+
+```bash
+curl -X POST http://localhost:8080/poems \
+  -H "Content-Type: application/json" \
+  -d '{"content":"  first line\r\nsecond line  "}'
+```
+
+Expected:
+- HTTP `201`
+- Response `content` normalized to `first line\nsecond line`
+
+Get a poem by id:
+
+```bash
+curl http://localhost:8080/poems/1
+```
+
+Daily feed (today in UTC):
+
+```bash
+curl http://localhost:8080/feed/daily
+```
+
+History/day feed:
+
+```bash
+curl http://localhost:8080/feed/daily/2026-03-15
+```
+
+Expected:
+- Daily/history endpoints return `day`, `count`, `limit`, and `items`
+- `limit` is always `10`
+- Valid day format is strict `YYYY-MM-DD`
+
+## 5) Guardrail configuration
+
+`POST /poems` has lightweight anti-pollution guardrails:
+
+- Per-IP rate limit, default `5` requests per `10` minutes
+- Duplicate-content rejection in recent window, default `24` hours
+
+Environment variables:
+
+- `POEMS_GUARDRAILS_RATE_LIMIT_MAX_REQUESTS` (default `5`)
+- `POEMS_GUARDRAILS_RATE_LIMIT_WINDOW` (default `PT10M`)
+- `POEMS_GUARDRAILS_DUPLICATE_WINDOW` (default `PT24H`)
+
+Rate-limited requests return HTTP `429` with a structured error payload including `retryAt`.
+
+## 6) SQLite storage
 
 - SQLite path defaults to `/app/data/poe.db` inside the app container.
 - Docker Compose maps `./db/sqlite-data` from your repo to `/app/data` for persistence.
