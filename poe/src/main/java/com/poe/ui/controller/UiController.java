@@ -60,7 +60,8 @@ public class UiController {
   }
 
   @GetMapping("/write")
-  public String write() {
+  public String write(Model model) {
+    populateWritePageState(model);
     return "write";
   }
 
@@ -80,8 +81,17 @@ public class UiController {
       model.addAttribute("content", content == null ? "" : content);
       model.addAttribute("errorCode", ex.getCode());
       model.addAttribute("errorMessage", ex.getMessage());
+      populateWritePageState(model);
       return "write";
     }
+  }
+
+  private void populateWritePageState(Model model) {
+    int todayCount = poemService.getTodayPoemCount();
+    boolean canSubmit = poemService.isTodaySubmissionOpen();
+    model.addAttribute("todayCount", todayCount);
+    model.addAttribute("todayLimit", PoemService.DAILY_POEM_LIMIT);
+    model.addAttribute("canSubmit", canSubmit);
   }
 
   private static int statusFor(String errorCode) {

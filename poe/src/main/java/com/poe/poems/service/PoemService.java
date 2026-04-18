@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class PoemService {
 
   private static final int MAX_CONTENT_LENGTH = 2000;
-  public static final int DAILY_FEED_LIMIT = 10;
+  public static final int DAILY_POEM_LIMIT = 30;
   private final PoemRepository poemRepository;
   private final int rateLimitMaxRequests;
   private final Duration rateLimitWindow;
@@ -49,6 +49,7 @@ public class PoemService {
     Instant createdAt = Instant.now();
     LocalDate publishDay = LocalDate.now(ZoneOffset.UTC);
     String normalizedHash = sha256Hex(normalizedContent);
+    enforceDailyPublishLimit(publishDay);
     enforceRateLimit(sourceIp, createdAt);
     enforceDuplicateGuard(normalizedHash, createdAt);
     long poemId = poemRepository.insertPoem(normalizedContent, normalizedHash, createdAt, publishDay);
@@ -69,8 +70,8 @@ public class PoemService {
   }
 
   public DailyFeedResponse getDailyFeedByDay(LocalDate day) {
-    List<Poem> poems = poemRepository.findFeedByPublishDay(day, DAILY_FEED_LIMIT);
-    return DailyFeedResponse.from(day, DAILY_FEED_LIMIT, poems);
+    List<Poem> poems = poemRepository.findFeedByPublishDay(day, DAILY_POEM_LIMIT);
+    return DailyFeedResponse.from(day, DAILY_POEM_LIMIT, poems);
   }
 
   public LocalDate parseStrictDay(String day) {
@@ -87,6 +88,14 @@ public class PoemService {
 
   public List<LocalDate> getPublishDaysWithPoems() {
     return poemRepository.findPublishDaysWithPoems();
+  }
+
+  public int getTodayPoemCount() {
+    return poemRepository.countByPublishDay(LocalDate.now(ZoneOffset.UTC));
+  }
+
+  public boolean isTodaySubmissionOpen() {
+    return getTodayPoemCount() < DAILY_POEM_LIMIT;
   }
 
   private String normalizeAndValidate(String content) {
@@ -142,6 +151,13 @@ public class PoemService {
     if (poemRepository.existsByNormalizedHashSince(normalizedHash, windowStart)) {
       throw new BadRequestException(
           "DUPLICATE_POEM", "Duplicate poem content was submitted recently");
+    }
+  }
+
+  private void enforceDailyPublishLimit(LocalDate publishDay) {
+    if (poemRepository.countByPublishDay(publishDay) >= DAILY_POEM_LIMIT) {
+      throw new BadRequestException(
+          "DAILY_LIMIT_REACHED", "There are already 30 poems today. No more submissions today.");
     }
   }
 }

@@ -22,6 +22,7 @@
   <main class="container">
     <section>
       <h2>Today's Poems</h2>
+      <p class="muted">Daily edition is capped at 30 poems.</p>
       <p class="muted" th:text="'UTC day: ' + ${day}"></p>
       <p class="success" th:if="${successMessage}" th:text="${successMessage}"></p>
       <p class="muted" th:if="${count == 0}">No poems have been posted yet today.</p>

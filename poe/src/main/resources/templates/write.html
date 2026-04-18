@@ -23,12 +23,14 @@
     <section>
       <h2>Write a poem</h2>
       <p class="muted">Max 2000 characters</p>
+      <p class="muted">Today's submissions: <span th:text="${todayCount} + ' / ' + ${todayLimit}"></span></p>
+      <p class="error" th:if="${!canSubmit}">There have already been 30 poems today, so can't submit any more today.</p>
       <p class="error" th:if="${errorMessage}" th:text="${errorMessage}"></p>
       <form method="post" action="/write">
         <label for="content">Poem</label>
-        <textarea id="content" name="content" maxlength="2000" required th:text="${content}"></textarea>
+        <textarea id="content" name="content" maxlength="2000" required th:text="${content}" th:disabled="${!canSubmit}"></textarea>
         <p id="char-counter" class="muted char-counter" aria-live="polite">0 / 2000 characters</p>
-        <button type="submit">Post poem</button>
+        <button type="submit" th:disabled="${!canSubmit}">Post poem</button>
       </form>
     </section>
   </main>

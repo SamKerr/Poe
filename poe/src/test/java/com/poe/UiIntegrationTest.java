@@ -117,6 +117,44 @@ class UiIntegrationTest {
         .andExpect(content().string(org.hamcrest.Matchers.containsString("   ")));
   }
 
+  @Test
+  void writePageDisablesSubmissionWhenDailyLimitReached() throws Exception {
+    LocalDate today = LocalDate.now(ZoneOffset.UTC);
+    Instant baseTime = Instant.parse("2026-06-02T00:00:00Z");
+    for (int i = 0; i < 30; i++) {
+      insertPoem("today-poem-" + i, today, baseTime.plusSeconds(i));
+    }
+
+    mockMvc
+        .perform(get("/write"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Today's submissions:")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString(">30 / 30<")))
+        .andExpect(
+            content()
+                .string(
+                    org.hamcrest.Matchers.containsString(
+                        "There have already been 30 poems today, so can't submit any more today.")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("button type=\"submit\" disabled")));
+  }
+
+  @Test
+  void writePageSubmitWhenDailyLimitReachedShowsError() throws Exception {
+    LocalDate today = LocalDate.now(ZoneOffset.UTC);
+    Instant baseTime = Instant.parse("2026-06-03T00:00:00Z");
+    for (int i = 0; i < 30; i++) {
+      insertPoem("limit-poem-" + i, today, baseTime.plusSeconds(i));
+    }
+
+    mockMvc
+        .perform(post("/write").header("X-Forwarded-For", "203.0.113.12").param("content", "one more poem"))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            content()
+                .string(org.hamcrest.Matchers.containsString("There are already 30 poems today. No more submissions today.")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("button type=\"submit\" disabled")));
+  }
+
   private void insertPoem(String content, LocalDate publishDay, Instant createdAt) {
     jdbcTemplate.update(
         "INSERT INTO poems (content, normalized_hash, created_at, publish_day) VALUES (?, ?, ?, ?)",

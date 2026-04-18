@@ -86,7 +86,7 @@ curl http://localhost:8080/feed/daily/2026-03-15
 
 Expected:
 - Daily/history endpoints return `day`, `count`, `limit`, and `items`
-- `limit` is always `10`
+- `limit` is always `30`
 - Valid day format is strict `YYYY-MM-DD`
 
 ## 5) Guardrail configuration
@@ -95,6 +95,7 @@ Expected:
 
 - Per-IP rate limit, default `5` requests per `10` minutes
 - Duplicate-content rejection in recent window, default `24` hours
+- Daily submission cap, default hard cap of `30` poems per UTC day
 
 Environment variables:
 

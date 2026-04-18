@@ -89,6 +89,13 @@ public class PoemRepository {
         (rs, rowNum) -> LocalDate.parse(rs.getString("publish_day")));
   }
 
+  public int countByPublishDay(LocalDate publishDay) {
+    Integer count =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM poems WHERE publish_day = ?", Integer.class, publishDay.toString());
+    return count == null ? 0 : count;
+  }
+
   public boolean existsByNormalizedHashSince(String normalizedHash, Instant sinceInclusive) {
     Integer count =
         jdbcTemplate.queryForObject(

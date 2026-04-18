@@ -7,7 +7,7 @@ Current product model is intentionally simple:
 - Anonymous publishing (no auth/account model)
 - Plain-text poems only
 - `content` hard limit of 2000 characters
-- Shared daily feed capped at 10 poems for a given UTC day
+- Shared daily feed capped at 30 poems for a given UTC day
 - History is browsed by requesting a specific day (no infinite timeline)
 
 ## Tech stack
@@ -81,6 +81,8 @@ The script will try to start Docker Desktop on macOS, wait for Docker to be read
 - Duplicate-content guard:
   - Rejects same normalized content hash submitted in configured recent window
   - Default window `24` hours
+- Daily cap guard:
+  - Rejects new submissions once `30` poems have been published for the current UTC day
 
 Config is controlled through properties/env vars:
 

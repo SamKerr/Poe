@@ -200,11 +200,11 @@ class PoemApiIntegrationTest {
   }
 
   @Test
-  void getDailyFeedIsDeterministicAndLimitedToTenItems() throws Exception {
+  void getDailyFeedIsDeterministicAndLimitedToThirtyItems() throws Exception {
     LocalDate todayUtc = LocalDate.now(ZoneOffset.UTC);
     Instant baseTime = Instant.parse("2026-01-01T00:00:00Z");
 
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 35; i++) {
       insertPoem("poem-" + i, todayUtc, baseTime.plusSeconds(i));
     }
 
@@ -213,9 +213,9 @@ class PoemApiIntegrationTest {
             .perform(get("/feed/daily"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.day").value(todayUtc.toString()))
-            .andExpect(jsonPath("$.limit").value(10))
-            .andExpect(jsonPath("$.count").value(10))
-            .andExpect(jsonPath("$.items.length()").value(10))
+            .andExpect(jsonPath("$.limit").value(30))
+            .andExpect(jsonPath("$.count").value(30))
+            .andExpect(jsonPath("$.items.length()").value(30))
             .andReturn();
 
     MvcResult second =
@@ -223,9 +223,9 @@ class PoemApiIntegrationTest {
             .perform(get("/feed/daily"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.day").value(todayUtc.toString()))
-            .andExpect(jsonPath("$.limit").value(10))
-            .andExpect(jsonPath("$.count").value(10))
-            .andExpect(jsonPath("$.items.length()").value(10))
+            .andExpect(jsonPath("$.limit").value(30))
+            .andExpect(jsonPath("$.count").value(30))
+            .andExpect(jsonPath("$.items.length()").value(30))
             .andReturn();
 
     assertEquals(first.getResponse().getContentAsString(), second.getResponse().getContentAsString());
@@ -248,7 +248,7 @@ class PoemApiIntegrationTest {
         .perform(get("/feed/daily"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.day").value(todayUtc.toString()))
-        .andExpect(jsonPath("$.limit").value(10))
+        .andExpect(jsonPath("$.limit").value(30))
         .andExpect(jsonPath("$.count").value(2))
         .andExpect(jsonPath("$.items.length()").value(2));
   }
@@ -276,12 +276,35 @@ class PoemApiIntegrationTest {
         .perform(get("/feed/daily/{day}", targetDay))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.day").value(targetDay))
-        .andExpect(jsonPath("$.limit").value(10))
+        .andExpect(jsonPath("$.limit").value(30))
         .andExpect(jsonPath("$.count").value(0))
         .andExpect(jsonPath("$.items.length()").value(0))
         .andExpect(content().json("""
-            {"day":"2026-03-15","count":0,"limit":10,"items":[]}
+            {"day":"2026-03-15","count":0,"limit":30,"items":[]}
             """));
+  }
+
+  @Test
+  void postPoemRejectsWhenDailyLimitReached() throws Exception {
+    LocalDate todayUtc = LocalDate.now(ZoneOffset.UTC);
+    Instant baseTime = Instant.parse("2026-06-01T00:00:00Z");
+    for (int i = 0; i < 30; i++) {
+      insertPoem("today-cap-poem-" + i, todayUtc, baseTime.plusSeconds(i));
+    }
+
+    mockMvc
+        .perform(
+            post("/poems")
+                .header("X-Forwarded-For", "198.51.100.250")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"content":"one more poem"}
+                    """))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error.code").value("DAILY_LIMIT_REACHED"))
+        .andExpect(
+            jsonPath("$.error.message")
+                .value("There are already 30 poems today. No more submissions today."));
   }
 
   private void insertPoem(String content, LocalDate publishDay, Instant createdAt) {
