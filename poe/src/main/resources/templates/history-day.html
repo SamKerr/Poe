@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poe - Day</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <header class="container">
+    <h1>Poe</h1>
+    <nav>
+      <a href="/">Today</a>
+      <a href="/history">History</a>
+      <a href="/write">Write</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2 th:text="'Poems for ' + ${day}"></h2>
+      <p class="error" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+      <p class="muted" th:if="${errorMessage == null and count == 0}">No poems available for this day.</p>
+      <ol class="poem-list" th:if="${errorMessage == null and count > 0}">
+        <li th:each="poem : ${poems}">
+          <article>
+            <pre th:text="${poem.content}"></pre>
+          </article>
+        </li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poe - Write</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <header class="container">
+    <h1>Poe</h1>
+    <nav>
+      <a href="/">Today</a>
+      <a href="/history">History</a>
+      <a href="/write">Write</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2>Write a poem</h2>
+      <p class="muted">Max 2000 characters</p>
+      <p class="error" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+      <form method="post" action="/write">
+        <label for="content">Poem</label>
+        <textarea id="content" name="content" maxlength="2000" required th:text="${content}"></textarea>
+        <button type="submit">Post poem</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

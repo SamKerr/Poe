@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poe - Today's Poems</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <header class="container">
+    <h1>Poe</h1>
+    <nav>
+      <a href="/">Today</a>
+      <a href="/history">History</a>
+      <a href="/write">Write</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2>Today's Poems</h2>
+      <p class="muted" th:text="'UTC day: ' + ${day}"></p>
+      <p class="success" th:if="${successMessage}" th:text="${successMessage}"></p>
+      <p class="muted" th:if="${count == 0}">No poems have been posted yet today.</p>
+      <ol class="poem-list" th:if="${count > 0}">
+        <li th:each="poem : ${poems}">
+          <article>
+            <pre th:text="${poem.content}"></pre>
+          </article>
+        </li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

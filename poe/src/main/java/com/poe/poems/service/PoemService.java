@@ -85,6 +85,10 @@ public class PoemService {
     }
   }
 
+  public List<LocalDate> getPublishDaysWithPoems() {
+    return poemRepository.findPublishDaysWithPoems();
+  }
+
   private String normalizeAndValidate(String content) {
     if (content == null) {
       throw new BadRequestException("CONTENT_REQUIRED", "content is required");

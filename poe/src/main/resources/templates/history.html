@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poe - History</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <header class="container">
+    <h1>Poe</h1>
+    <nav>
+      <a href="/">Today</a>
+      <a href="/history">History</a>
+      <a href="/write">Write</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2>History</h2>
+      <p class="muted">Days with poems (newest first)</p>
+      <ul class="day-list" th:if="${!#lists.isEmpty(days)}">
+        <li th:each="day : ${days}">
+          <a th:href="@{/history/{day}(day=${day})}" th:text="${day}"></a>
+        </li>
+      </ul>
+      <p class="muted" th:if="${#lists.isEmpty(days)}">No poem history yet.</p>
+    </section>
+  </main>
+</body>
+</html>
