@@ -1,5 +1,9 @@
-package com.poe.poems;
+package com.poe.poems.advice;
 
+import com.poe.poems.dto.ErrorResponse;
+import com.poe.poems.exception.BadRequestException;
+import com.poe.poems.exception.NotFoundException;
+import com.poe.poems.exception.TooManyRequestsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

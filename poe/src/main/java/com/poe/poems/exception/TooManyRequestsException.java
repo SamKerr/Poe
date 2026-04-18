@@ -1,4 +1,4 @@
-package com.poe.poems;
+package com.poe.poems.exception;
 
 import java.time.Instant;
 

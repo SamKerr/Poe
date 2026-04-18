@@ -1,4 +1,4 @@
-package com.poe.poems;
+package com.poe.poems.exception;
 
 public abstract class ApiException extends RuntimeException {
 

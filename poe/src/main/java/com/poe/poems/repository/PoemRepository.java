@@ -1,5 +1,6 @@
-package com.poe.poems;
+package com.poe.poems.repository;
 
+import com.poe.poems.model.Poem;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.Instant;

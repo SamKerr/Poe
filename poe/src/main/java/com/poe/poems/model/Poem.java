@@ -1,4 +1,4 @@
-package com.poe.poems;
+package com.poe.poems.model;
 
 import java.time.Instant;
 import java.time.LocalDate;

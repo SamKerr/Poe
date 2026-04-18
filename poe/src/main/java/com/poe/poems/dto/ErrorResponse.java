@@ -1,5 +1,7 @@
-package com.poe.poems;
+package com.poe.poems.dto;
 
+import com.poe.poems.exception.ApiException;
+import com.poe.poems.exception.TooManyRequestsException;
 import java.time.Instant;
 
 public record ErrorResponse(ErrorDetail error) {

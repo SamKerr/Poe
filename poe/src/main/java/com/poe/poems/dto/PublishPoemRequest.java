@@ -1,3 +1,3 @@
-package com.poe.poems;
+package com.poe.poems.dto;
 
 public record PublishPoemRequest(String content) {}

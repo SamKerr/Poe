@@ -1,4 +1,4 @@
-package com.poe.poems;
+package com.poe.poems.exception;
 
 public class NotFoundException extends ApiException {
 

@@ -1,5 +1,6 @@
-package com.poe.poems;
+package com.poe.poems.dto;
 
+import com.poe.poems.model.Poem;
 import java.time.LocalDate;
 import java.util.List;
 
