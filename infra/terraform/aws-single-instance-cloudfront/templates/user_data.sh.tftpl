@@ -1,0 +1,88 @@
+#!/bin/bash
+set -euxo pipefail
+
+APP_PORT="${app_port}"
+APP_IMAGE="${app_image}"
+SQLITE_DEVICE="${sqlite_device_name}"
+SQLITE_MOUNT_PATH="${sqlite_mount_path}"
+COMPOSE_DIR="/opt/poe"
+RESOLVED_SQLITE_DEVICE="${SQLITE_DEVICE}"
+
+if [[ -z "${APP_IMAGE}" ]]; then
+  echo "APP_IMAGE must not be empty."
+  exit 1
+fi
+
+dnf update -y
+dnf install -y docker
+dnf install -y amazon-cloudwatch-agent || true
+
+systemctl enable docker
+systemctl start docker
+
+mkdir -p "${SQLITE_MOUNT_PATH}"
+
+# Wait for EBS attachment, then format once and mount persistently.
+for i in $(seq 1 60); do
+  if [[ -b "${SQLITE_DEVICE}" ]]; then
+    RESOLVED_SQLITE_DEVICE="${SQLITE_DEVICE}"
+    break
+  fi
+  if [[ -b "/dev/nvme1n1" ]]; then
+    RESOLVED_SQLITE_DEVICE="/dev/nvme1n1"
+    break
+  fi
+  sleep 2
+done
+
+if [[ ! -b "${RESOLVED_SQLITE_DEVICE}" ]]; then
+  echo "Data device ${SQLITE_DEVICE} was not attached in time."
+  exit 1
+fi
+
+if ! blkid "${RESOLVED_SQLITE_DEVICE}"; then
+  mkfs.ext4 "${RESOLVED_SQLITE_DEVICE}"
+fi
+
+SQLITE_UUID="$(blkid -s UUID -o value "${RESOLVED_SQLITE_DEVICE}")"
+grep -q "${SQLITE_UUID}" /etc/fstab || echo "UUID=${SQLITE_UUID} ${SQLITE_MOUNT_PATH} ext4 defaults,nofail 0 2" >> /etc/fstab
+mount -a
+
+mkdir -p "${COMPOSE_DIR}"
+cat > "${COMPOSE_DIR}/docker-compose.yml" <<EOF
+services:
+  poe-api:
+    image: ${APP_IMAGE}
+    container_name: poe-api
+    restart: unless-stopped
+    environment:
+      SQLITE_DATASOURCE_URL: jdbc:sqlite:/app/data/poe.db
+      SERVER_PORT: ${APP_PORT}
+    ports:
+      - "${APP_PORT}:8080"
+    volumes:
+      - ${SQLITE_MOUNT_PATH}:/app/data
+EOF
+
+cat > /etc/systemd/system/poe-compose.service <<EOF
+[Unit]
+Description=Poe app container stack
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=${COMPOSE_DIR}
+ExecStart=/usr/bin/docker compose up -d
+ExecStop=/usr/bin/docker compose down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable poe-compose.service
+systemctl start poe-compose.service

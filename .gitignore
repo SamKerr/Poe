@@ -21,3 +21,9 @@
 db/sqlite-data/*.db
 db/sqlite-data/*.db-*
 
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+
