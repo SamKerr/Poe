@@ -39,22 +39,20 @@ Force a fresh image rebuild:
 ./start-app.sh --build
 ```
 
-## 3) Verify the app is running
+## 3) Verify UI routes
 
-```bash
-curl http://localhost:8080/
-curl http://localhost:8080/sqlite
-curl http://localhost:8080/users
-curl http://localhost:8080/sqlite/users
-```
+Open these in your browser:
+
+- `http://localhost:8080/` (today's poems)
+- `http://localhost:8080/history` (days with poems only)
+- `http://localhost:8080/write` (submit a poem)
 
 Expected:
-- `/` returns an `ok` status with DB check
-- `/sqlite` returns an `ok` status with SQLite check
-- `/users` returns seeded records
-- `/sqlite/users` returns seeded SQLite records
+- Landing page shows today's poems only
+- History lists day links with poems
+- Write page posts a poem and redirects back to `/`
 
-## 4) Verify poem endpoints
+## 4) Verify API endpoints
 
 Create a poem:
 

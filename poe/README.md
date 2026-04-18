@@ -47,15 +47,14 @@ From repository root:
 
 The script will try to start Docker Desktop on macOS, wait for Docker to be ready, create `.env` from `.env.example` if missing, then run the compose stack.
 
-## Verify app and query DB
+## Verify app and UI
 
-1. Check app and database connectivity:
-   - `curl http://localhost:8080/`
-   - `curl http://localhost:8080/sqlite`
-   - `curl http://localhost:8080/users`
-   - `curl http://localhost:8080/sqlite/users`
+1. Open UI pages in a browser:
+   - `http://localhost:8080/` (today's poems)
+   - `http://localhost:8080/history` (days with poems)
+   - `http://localhost:8080/write` (publish a poem)
 
-2. Publish and read poems:
+2. Verify API endpoints:
    - Create a poem:
      - `curl -X POST http://localhost:8080/poems -H "Content-Type: application/json" -d '{"content":"first line\nsecond line"}'`
    - Fetch by id:

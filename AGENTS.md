@@ -62,10 +62,10 @@ Use this process for multi-step feature work so planning and delivery are consis
 - Build: `cd poe && ./mvnw clean install`
 - Run stack when needed: `./start-app.sh` (or `./start-app.sh --build`)
 - Validate endpoints you expect to have changed, eg:
-  - `curl http://localhost:8080/`
-  - `curl http://localhost:8080/users`
-  - `curl http://localhost:8080/sqlite`
-  - `curl http://localhost:8080/sqlite/users`
+  - `curl http://localhost:8080/poems/1`
+  - `curl http://localhost:8080/feed/daily`
+  - `curl http://localhost:8080/feed/daily/2026-03-15`
+  - open `http://localhost:8080/` and `http://localhost:8080/history`
 
 ## Safety
 
