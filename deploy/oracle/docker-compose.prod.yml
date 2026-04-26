@@ -1,0 +1,27 @@
+services:
+  poe-api:
+    image: ${POE_APP_IMAGE:-ghcr.io/sam/poe:latest}
+    container_name: poe-api
+    restart: unless-stopped
+    environment:
+      SQLITE_DATASOURCE_URL: ${SQLITE_DATASOURCE_URL:-jdbc:sqlite:/app/data/poe.db}
+      SERVER_PORT: 8080
+    volumes:
+      - ${POE_SQLITE_DIR:-/srv/poe/sqlite-data}:/app/data
+
+  caddy:
+    image: caddy:2.8
+    container_name: poe-caddy
+    restart: unless-stopped
+    depends_on:
+      - poe-api
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN is required}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL is required}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${POE_CADDY_DATA_DIR:-/srv/poe/caddy-data}:/data
+      - ${POE_CADDY_CONFIG_DIR:-/srv/poe/caddy-config}:/config

@@ -5,12 +5,11 @@ set -euo pipefail
 BASE_URL="${BASE_URL:-${1:-}}"
 
 if [[ -z "${BASE_URL}" ]]; then
-  echo "Usage: BASE_URL=https://example.cloudfront.net $0"
-  echo "   or: $0 https://example.cloudfront.net"
+  echo "Usage: BASE_URL=https://poe.example.com $0"
+  echo "   or: $0 https://poe.example.com"
   exit 2
 fi
 
-# Normalize trailing slash so route joins are predictable.
 BASE_URL="${BASE_URL%/}"
 
 TMP_DIR="$(mktemp -d)"
@@ -62,7 +61,7 @@ request_contains() {
   pass "${label} returned ${status} and included expected content"
 }
 
-echo "Running cloud smoke tests against ${BASE_URL}"
+echo "Running Oracle deployment smoke tests against ${BASE_URL}"
 
 request_status "/" "200" "home page"
 request_status "/history" "200" "history page"
@@ -94,4 +93,4 @@ pass "create poem response contained id ${POEM_ID}"
 request_contains "/poems/${POEM_ID}" "200" "${MARKER}" "poem lookup"
 request_contains "/feed/daily" "200" "${MARKER}" "daily feed persistence check"
 
-echo "All cloud smoke checks passed"
+echo "All Oracle smoke checks passed"

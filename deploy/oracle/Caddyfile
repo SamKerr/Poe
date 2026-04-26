@@ -1,0 +1,14 @@
+{
+  email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+  encode zstd gzip
+
+  @health {
+    path /healthz
+  }
+  respond @health 200
+
+  reverse_proxy poe-api:8080
+}

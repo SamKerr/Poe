@@ -7,6 +7,7 @@ This document defines operational practices for SQLite persistence and backup/re
 - App container database path: `/app/data/poe.db`
 - Host-side persistent path for local/dev compose: `./db/sqlite-data/poe.db`
 - Recommended cloud host path for mounted persistent storage (for example an attached volume): `/mnt/poe-data/poe.db`
+- Oracle personal-hosting path used by this repo runbook: `/srv/poe/sqlite-data/poe.db`
 
 Set the runtime datasource path with `SQLITE_DATASOURCE_URL`:
 
@@ -27,6 +28,7 @@ All scripts are in `scripts/` and are safe, parameterized Bash utilities:
 - `sqlite-backup.sh`: timestamped backup copy with optional gzip compression and optional retention trimming.
 - `sqlite-restore.sh`: restore from `.db` or `.db.gz` with optional pre/post service hook commands.
 - `verify-sqlite-persistence.sh`: validates file persistence and (if `sqlite3` exists) validates DB integrity plus a probe row across restart.
+- `oracle-install-backup-cron.sh`: installs/updates a cron schedule for recurring backups on Oracle VM hosts.
 
 Use `--help` on each script for current options and examples.
 
@@ -47,6 +49,15 @@ Example (hourly compressed backup with rolling retention of 24 files):
   --compress \
   --keep 24 \
   --label poe-hourly
+```
+
+Oracle VM default automation example (hourly schedule):
+
+```bash
+sudo DB_PATH=/srv/poe/sqlite-data/poe.db \
+  BACKUP_DIR=/srv/poe/backups \
+  KEEP_COUNT=48 \
+  bash ./scripts/oracle-install-backup-cron.sh
 ```
 
 ## Restore Test Procedure
