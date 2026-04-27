@@ -1,25 +1,26 @@
 # SQLite Persistence and Backup Operations
 
-This document defines operational practices for SQLite persistence and backup/restore for Poe in single-instance mode.
+This document defines operational practices for SQLite persistence and backup/restore for Poe in single-instance mode, including the active Oracle VM deployment.
 
 ## Mount Path Conventions
 
 - App container database path: `/app/data/poe.db`
 - Host-side persistent path for local/dev compose: `./db/sqlite-data/poe.db`
-- Recommended cloud host path for mounted persistent storage (for example an attached volume): `/mnt/poe-data/poe.db`
-- Oracle personal-hosting path used by this repo runbook: `/srv/poe/sqlite-data/poe.db`
+- Active Oracle host path: `/srv/poe/sqlite-data/poe.db`
+- Active Oracle backup path: `/srv/poe/backups`
 
 Set the runtime datasource path with `SQLITE_DATASOURCE_URL`:
 
 ```bash
-SQLITE_DATASOURCE_URL=jdbc:sqlite:/mnt/poe-data/poe.db
+SQLITE_DATASOURCE_URL=jdbc:sqlite:/srv/poe/sqlite-data/poe.db
 ```
 
 ### Ownership and Permissions
 
 - Ensure the parent directory exists before service start.
-- Ensure the service user can read and write `poe.db`.
-- Recommended DB file mode for runtime: `640` (or stricter where service user/group access still works).
+- Ensure the runtime user can read and write `poe.db`.
+- Recommended DB file mode for runtime: `640`.
+- Current deployed host uses root-owned paths under `/srv/poe`; manual backup/restore is typically run with `sudo`.
 
 ## Scripts
 
@@ -40,11 +41,11 @@ Minimum baseline for single-instance SQLite:
 - Daily backups retained for 14 to 30 days.
 - Take an on-demand backup immediately before deploys or maintenance.
 
-Example (hourly compressed backup with rolling retention of 24 files):
+Generic example (hourly compressed backup with rolling retention of 24 files):
 
 ```bash
 ./scripts/sqlite-backup.sh \
-  --source /mnt/poe-data/poe.db \
+  --source /srv/poe/sqlite-data/poe.db \
   --backup-dir /var/backups/poe \
   --compress \
   --keep 24 \
@@ -58,6 +59,16 @@ sudo DB_PATH=/srv/poe/sqlite-data/poe.db \
   BACKUP_DIR=/srv/poe/backups \
   KEEP_COUNT=48 \
   bash ./scripts/oracle-install-backup-cron.sh
+```
+
+Immediate validation on Oracle VM:
+
+```bash
+sudo SQLITE_DB_PATH="/srv/poe/sqlite-data/poe.db" /bin/bash "./scripts/sqlite-backup.sh" \
+  --backup-dir "/srv/poe/backups" \
+  --label "poe-oracle" \
+  --compress \
+  --keep "48"
 ```
 
 ## Restore Test Procedure
@@ -75,13 +86,13 @@ Example restore flow:
 ```bash
 ./scripts/sqlite-restore.sh \
   --backup-file /var/backups/poe/poe-hourly-20260418T120000Z.db.gz \
-  --target /mnt/poe-data/poe.db \
+  --target /srv/poe/sqlite-data/poe.db \
   --pre-hook-cmd "systemctl stop poe-api" \
   --post-hook-cmd "systemctl start poe-api" \
   --run-hooks
 
 ./scripts/verify-sqlite-persistence.sh \
-  --db-file /mnt/poe-data/poe.db \
+  --db-file /srv/poe/sqlite-data/poe.db \
   --restart-cmd "systemctl restart poe-api"
 ```
 

@@ -44,9 +44,14 @@ Deploy Poe on Oracle Cloud Always Free using Docker Compose with a custom domain
 
 ## Done criteria
 
-- [ ] Oracle VM can run Poe via Docker Compose
-- [ ] Domain resolves to VM and serves HTTPS successfully
-- [ ] SQLite data persists across service restart and VM reboot
-- [ ] Scheduled backup job is configured and tested
-- [ ] Restore workflow is documented and validated
-- [ ] Docs cover deploy, verify, operate, and recover
+- [x] Oracle VM can run Poe via Docker Compose
+- [x] Domain resolves to VM and serves HTTPS successfully
+- [x] SQLite data persists across service restart and VM reboot
+- [x] Scheduled backup job is configured and tested
+- [x] Restore workflow is documented and validated
+- [x] Docs cover deploy, verify, operate, and recover
+
+## Delivery notes
+
+- Production endpoint is live at `https://poe.sam-kerr.co.uk`.
+- Restore drill and reboot drill were explicitly deferred by owner decision and accepted for this sprint close.

@@ -27,3 +27,6 @@ db/sqlite-data/*.db-*
 *.tfstate
 *.tfstate.*
 
+
+# Local SSH keys
+deploy/ssh/

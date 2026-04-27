@@ -2,6 +2,10 @@
 
 This project contains a Spring Boot app in `poe` using SQLite as the primary database.
 
+Current deployed production endpoint:
+
+- `https://poe.sam-kerr.co.uk`
+
 ## Prerequisites
 
 - Docker Desktop running (or Docker daemon via Colima)
@@ -146,3 +150,19 @@ If Maven window is missing:
   - Start Docker Desktop, then re-run `./start-app.sh`.
 - **`mvn` command not found**
   - Use `./mvnw` inside `poe` instead of `mvn`.
+
+## 8) Production checks (Oracle deployment)
+
+Use these checks against the live endpoint after deploys:
+
+```bash
+curl -I http://poe.sam-kerr.co.uk/
+curl -I https://poe.sam-kerr.co.uk/
+BASE_URL="https://poe.sam-kerr.co.uk" bash ./scripts/oracle-smoke-tests.sh
+```
+
+Expected:
+
+- HTTP returns `308` redirect to HTTPS
+- HTTPS returns `200`
+- Smoke test ends with `All Oracle smoke checks passed`
