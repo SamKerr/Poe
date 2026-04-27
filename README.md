@@ -1,104 +1,52 @@
-# Poe API
+<h1>
+  <img src="https://poe.sam-kerr.co.uk/poe.webp" alt="Poe header image" width="56" style="vertical-align: middle; margin-right: 8px;" />
+  Poe
+</h1>
 
-`poe/` contains the Spring Boot backend service for Poe.
+Poetry publishing app with a Spring Boot backend, SQLite persistence, and Docker-based runtime.
 
-Current product model is intentionally simple:
 
-- Anonymous publishing (no auth/account model)
-- Plain-text poems only
-- `content` hard limit of 2000 characters
-- Shared daily feed capped at 30 poems for a given UTC day
-- History is browsed by requesting a specific day (no infinite timeline)
 
-## Tech stack
+Live site: [https://poe.sam-kerr.co.uk](https://poe.sam-kerr.co.uk)
 
-- Java + Spring Boot
-- Maven wrapper (`./mvnw`)
-- SQLite (primary local database)
-- Docker Compose for local stack orchestration
+## Repo layout
 
-## Run with Docker Compose
+- `poe/` - backend application code and Maven project
+- `docs/` - build/run, deployment, and operations runbooks
+- `deploy/oracle/` - production Docker Compose and Caddy config for Oracle VM
+- `scripts/` - helper scripts for deploy, smoke tests, and backups
+- `sprints/` - sprint plans and ticket history
 
-From repository root:
+## Quick start (local)
 
-1. `cp .env.example .env`
-2. `docker compose -f docker-compose.yml up -d --build`
-3. `docker compose -f docker-compose.yml logs -f poe-api`
+From repo root:
 
-## Build locally (no global Maven install)
+```bash
+cp .env.example .env
+./start-app.sh --build
+```
 
-From `poe/`:
+Then open:
 
-- `./mvnw clean install`
+- `http://localhost:8080/`
+- `http://localhost:8080/history`
+- `http://localhost:8080/write`
 
-## API docs (Swagger)
+## Production deployment (Oracle Always Free)
 
-Once the app is running locally:
+Current production path uses Oracle VM + Caddy + Docker Compose.
 
-- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
-- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+Primary runbook:
 
-### Quick start script
+- `docs/ORACLE_ALWAYS_FREE_DEPLOYMENT.md`
 
-From repository root:
+Supporting operations docs:
 
-- `./start-app.sh`
-- `./start-app.sh --build` (force rebuild)
+- `docs/SQLITE_PERSISTENCE_AND_BACKUP.md`
+- `docs/BUILD_AND_RUN.md`
 
-The script will try to start Docker Desktop on macOS, wait for Docker to be ready, create `.env` from `.env.example` if missing, then run the compose stack.
+## Backend details
 
-## Verify app and UI
+App-specific development and API details live in:
 
-1. Open UI pages in a browser:
-   - `http://localhost:8080/` (today's poems)
-   - `http://localhost:8080/history` (days with poems)
-   - `http://localhost:8080/write` (publish a poem)
-
-2. Verify API endpoints:
-   - Create a poem:
-     - `curl -X POST http://localhost:8080/poems -H "Content-Type: application/json" -d '{"content":"first line\nsecond line"}'`
-   - Fetch by id:
-     - `curl http://localhost:8080/poems/1`
-   - Daily feed (today UTC):
-     - `curl http://localhost:8080/feed/daily`
-   - Feed for a specific UTC day:
-     - `curl http://localhost:8080/feed/daily/2026-03-15`
-
-## API behavior and constraints
-
-### `POST /poems`
-
-- Accepts JSON body with `content` string
-- Normalizes line breaks to `\n` and trims outer whitespace
-- Rejects null/blank content
-- Rejects content over 2000 characters
-- Returns `201 Created` with poem payload
-
-### Guardrails on `POST /poems`
-
-- IP rate limit guard (from `X-Forwarded-For` first value, fallback to remote addr):
-  - Default `5` requests / `10` minutes per IP
-- Duplicate-content guard:
-  - Rejects same normalized content hash submitted in configured recent window
-  - Default window `24` hours
-- Daily cap guard:
-  - Rejects new submissions once `30` poems have been published for the current UTC day
-
-Config is controlled through properties/env vars:
-
-- `poems.guardrails.rate-limit.max-requests` (`POEMS_GUARDRAILS_RATE_LIMIT_MAX_REQUESTS`, default `5`)
-- `poems.guardrails.rate-limit.window` (`POEMS_GUARDRAILS_RATE_LIMIT_WINDOW`, default `PT10M`)
-- `poems.guardrails.duplicate-window` (`POEMS_GUARDRAILS_DUPLICATE_WINDOW`, default `PT24H`)
-
-### Structured error responses
-
-Errors are returned as:
-
-- `{"error":{"code":"...","message":"...","retryAt":"..."}}`
-
-`retryAt` is populated for rate-limit responses (`429`) and null for other error classes.
-
-## Database connection values in container
-
-- SQLite JDBC URL is read from `SQLITE_DATASOURCE_URL` in `.env`
-- Default SQLite file path in container: `/app/data/poe.db`
+- `poe/README.md`
